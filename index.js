@@ -28,6 +28,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const serviceCollection = client.db('carDoctor').collection('services');
+    const bookingCollection = client.db('carDoctor').collection('boolings');
+
+
     // get all services data 
     app.get('/services',async(req,res)=>{
       const cursor = serviceCollection.find();
@@ -35,22 +39,29 @@ async function run() {
       res.send(result)
     })
 
-    // get specific sewrvice data
+    // get specific service data
     app.get('/services/:id', async(req,res)=>{
       const id = req.params.id;
       const quary = {_id : new ObjectId(id)}
-
-      const options = {
-        
+      const options = {  
         // Include only the `title` and `imdb` fields in the returned document
-        projection: { title: 1, price: 1 , service_id : 1},
+        projection: { title: 1, price: 1 , service_id : 1,img: 1},
       };
 
       const result = await serviceCollection.findOne(quary,options);
       res.send(result)
     })
 
-    const serviceCollection = client.db('carDoctor').collection('services');
+    // bookings 
+    app.post('/bookings',async(req,res)=>{
+      const booking = req.body;
+      console.log(booking);
+      const result = await bookingCollection.insertOne(booking)
+      res.send(result)
+
+    })
+
+    
 
 
     // Send a ping to confirm a successful connection
